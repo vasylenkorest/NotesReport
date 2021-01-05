@@ -1,0 +1,122 @@
+<aura:component controller="customNotesReportController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId" access="global" >
+	
+    <aura:attribute name="dataNotes" type="ContentDocument[]" />
+    <aura:attribute name="columns" type="List" />
+    <aura:attribute name="sortDirection" type="String" default="asc" />
+    <aura:attribute name="defaultSortDirection" type="String" default="asc" />
+    <aura:attribute name="sortedBy" type="String" />
+    <aura:attribute name="loadMoreStatus" type="String" default=""/>
+
+    <aura:attribute name="createdBy" type="List" default="[{'label': 'No User', 'value': 'null'}]"/>
+    <aura:attribute name="lastRevisedBy" type="List" default="[{'label': 'No User', 'value': 'null'}]"/>
+    <aura:attribute name="filterByRecordName" type="List" default=""/>
+    <aura:attribute name="selectedObject" type="List" default=""/>
+    <aura:attribute name="chosesObject" type="List" default=""/>
+    <aura:attribute name="FromPublishedDate" type="String" default=""/>
+    <aura:attribute name="ToPublishedDate" type="String" default=""/>
+    
+    <aura:attribute name="isOpen" type="boolean" default="false"/>
+    <aura:attribute name="isLoading" type="boolean" default="false"/>
+    <aura:attribute name="filterIsUse" type="boolean" default="false"/>
+    <aura:attribute name="infinitiScrollCheck" type="boolean" default="false"/>
+
+    <aura:handler name="init" value="{! this }" action="{! c.init }"/>
+
+    	<lightning:card class="slds-p-left_xx-small ">
+           <div style="display: flex; justify-content: flex-end; width: 100%;">
+    
+                    <lightning:button variant="brand-outline" label="Export as CSV" onclick="{! c.exportToExcel }"/>
+                    <lightning:buttonIcon iconName="utility:filterList"
+                                          variant="brand-outline"
+                                          title="Filter"
+                                          onclick="{! c.openModal }" />
+                
+           </div>
+        </lightning:card>
+    
+    
+         <div style="display:flex; flex-direction: row-reverse; width: 100%;">
+             
+                        
+           <aura:if isTrue="{!v.isOpen}">
+           
+           <div style=" width: 30%;">
+                 <div class="slds-p-left_xx-small" style="display: flex; width: 100%;" >
+						<div style="display: flex; width: 100%; background-color: white;  justify-content: flex-end; padding: 30px;">
+                            	<div style="display: flex; flex-direction: column; width: 100%;"> 
+									<lightning:dualListbox aura:id="filterBychosesObject"
+                                                   label="Object Name"
+                                                   sourceLabel="Available"
+                                                   selectedLabel="Selected"
+                                                   fieldLevelHelp="Select Object Name"
+                                                   options="{!v.chosesObject}"
+                                                   />
+                                    
+                                    <lightning:dualListbox aura:id="filterByRecordName"
+                                                   label="Record Name"
+                                                   sourceLabel="Available"
+                                                   selectedLabel="Selected"
+                                                   fieldLevelHelp="Select Record Name"
+                                                   options="{!v.filterByRecordName}"
+                                                   />
+                                    
+                                    <lightning:dualListbox aura:id="CreatedBy"
+                                                   label="Created By"
+                                                   sourceLabel="Available"
+                                                   selectedLabel="Selected"
+                                                   fieldLevelHelp="Select Created By"
+                                                   options="{!v.createdBy}"
+                                                   />
+                                    <lightning:dualListbox aura:id="lastRevisedBy"
+                                                   label="Last Revised By"
+                                                   sourceLabel="Available"
+                                                   selectedLabel="Selected"
+                                                   fieldLevelHelp="Select Last Revised By"
+                                                   options="{!v.lastRevisedBy}"
+                                                   />
+                                    
+                                    
+                                    <div style="display:flex; flex-direction: column;" class="slds-m-around_xx-small">
+                                    <div style="display:flex;  flex-direction: column;">
+                                        <div style="display:flex; "> 
+                                            <lightning:input aura:id="FromPublishedDate" class="slds-m-around_xx-small" type="date" name="FromPublishedDate" label="From Published Date"/>
+                                            <lightning:input aura:id="ToPublishedDate" class="slds-m-around_xx-small" type="date" name="ToPublishedDate" label="To Published Date" />
+                                        </div>
+                                        <div style="display:flex;">
+                                            <lightning:input aura:id="FromLastRevisedDate" class="slds-m-around_xx-small" type="date" name="FromLastRevisedDate" label="From Last Revised Date" />
+                                            <lightning:input aura:id="ToLastRevisedDate" class="slds-m-around_xx-small" type="date" name="ToLastRevisedDate" label="To Last Revised Date"/>
+                                        </div>
+                                    </div>
+                                    <lightning:textarea aura:id="keyWordNC" name="KeyWord" label="Keywords"/>
+                                    <div style="display:flex; margin:25px; justify-content: flex-end;">
+                                        <lightning:button variant="brand" label="Apply" onclick="{! c.setDataFilter }"/>
+                                        <div style="width: 10px;"></div>
+                                        <lightning:button variant="brand-outline" label="Reset" onclick="{! c.resetFilter }"/>
+                                    </div>
+                           		</div>
+                           		</div>
+                            	
+                            </div>
+                          </div>
+                        
+                       </div>
+               
+             </aura:if>
+
+		<div aura:id="changeIt" style="height:600px;">
+            <lightning:datatable
+                keyField="id"
+                columns="{!v.columns }"
+                data="{!v.dataNotes}"
+                hideCheckBoxColumn="true"
+                defaultSortDirection="{!v.defaultSortDirection}"
+                sortedDirection="{!v.sortDirection}"
+                sortedBy="{!v.sortedBy}"
+                onsort="{!c.handleSort}"
+                enableInfiniteLoading="true"
+                onloadmore="{! c.loadMoreData }"               
+                >
+            </lightning:datatable>
+        </div>
+	</div>
+</aura:component>
